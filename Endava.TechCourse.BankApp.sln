@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Endava.TechCourse.BankApp.Server", "Server\Endava.TechCourse.BankApp.Server.csproj", "{89ECD709-59DB-4AFD-9214-C1DE8C0E4A25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Endava.TechCourse.BankApp.Server", "Server\Endava.TechCourse.BankApp.Server.csproj", "{89ECD709-59DB-4AFD-9214-C1DE8C0E4A25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Endava.TechCourse.BankApp.Client", "Client\Endava.TechCourse.BankApp.Client.csproj", "{15E3B994-5A4E-4F6F-898F-17E2B85658E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Endava.TechCourse.BankApp.Client", "Client\Endava.TechCourse.BankApp.Client.csproj", "{15E3B994-5A4E-4F6F-898F-17E2B85658E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Endava.TechCourse.BankApp.Shared", "Shared\Endava.TechCourse.BankApp.Shared.csproj", "{808F116A-2DDD-4B79-A1C2-0BBE0C81C751}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Endava.TechCourse.BankApp.Shared", "Shared\Endava.TechCourse.BankApp.Shared.csproj", "{808F116A-2DDD-4B79-A1C2-0BBE0C81C751}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Endava.TechCourse.BankApp.Domain", "Endava.TechCourse.BankApp.Domain\Endava.TechCourse.BankApp.Domain.csproj", "{937EBC55-5A73-4E32-89BA-7DB9E29FCE20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{808F116A-2DDD-4B79-A1C2-0BBE0C81C751}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{808F116A-2DDD-4B79-A1C2-0BBE0C81C751}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{808F116A-2DDD-4B79-A1C2-0BBE0C81C751}.Release|Any CPU.Build.0 = Release|Any CPU
+		{937EBC55-5A73-4E32-89BA-7DB9E29FCE20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{937EBC55-5A73-4E32-89BA-7DB9E29FCE20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{937EBC55-5A73-4E32-89BA-7DB9E29FCE20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{937EBC55-5A73-4E32-89BA-7DB9E29FCE20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
