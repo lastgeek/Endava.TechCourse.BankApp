@@ -1,0 +1,62 @@
+﻿@page "/wallet/create_wallet"
+@using System.Text.Json;
+@inject HttpClient HttpClient
+@inject ISnackbar Snackbar
+
+<PageTitle>Create wallet</PageTitle>
+
+<MudGrid Class="d-flex align-center justify-center mud-width-full py-4">
+    <MudPaper Class="pa-4">
+        <MudText Align="Align.Center" Class="mb-n4">Create wallet</MudText>
+        <br/>
+        <MudForm @bind-IsValid="@success">
+            <MudTextField @bind-Value="TypeValue" Label="Type" Required="true" RequiredError="Type is required!" />
+            <MudTextField @bind-Value="AmountValue" Label="Amount" Required="true" RequiredError="Amount is required!" />
+            <MudTextField @bind-Value="CurrencyName" Label="Currency" Required="true" RequiredError="Currency is required!" />
+            <MudTextField @bind-Value="CurrencyRate" Validation="@(new Func<decimal, IEnumerable<string>>(CurrencyRateValidation))" Label="Currency Rate" Required="true" RequiredError="Currency Rate is required!" />
+            <br/>
+            <div class="d-flex align-center justify-space-between">
+                <MudButton Disabled="@(!success)" Variant="Variant.Text" Class="ml-auto" Color="Color.Primary" OnClick="() => CreateNewWallet()">Create</MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+</MudGrid>
+
+
+@code {
+    bool success;
+    public string TypeValue { get; set; }
+    public decimal AmountValue { get; set; }
+    public string CurrencyName { get; set; }
+    public decimal CurrencyRate { get; set; } = 1;
+
+    private IEnumerable<string> CurrencyRateValidation(decimal cr)
+    {
+        if (cr <= 0.0m)
+            yield return "Currency rates cannot be equal to or less than 0";
+    }
+
+    async Task CreateNewWallet()
+    {
+        var newWallet = new CreateWalletDTO
+            {
+                Type = TypeValue,
+                Amount = AmountValue,
+                CurrencyName = CurrencyName,
+                CurrencyRate = CurrencyRate
+            };
+
+        var content = new StringContent(JsonSerializer.Serialize(newWallet), System.Text.Encoding.UTF8, "application/json");
+        var response = await HttpClient.PostAsync("https://localhost:7100/api/wallet", content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Snackbar.Add("The wallet was created", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Error! The wallet was not created", Severity.Error);
+        }
+    }
+
+}

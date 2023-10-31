@@ -26,9 +26,9 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                 Amount = createWalletDTO.Amount,
                 Currency = new Currency
                 {
-                    Name = "EURO",
-                    CurrencyCode = "EURO",
-                    CurrencyRate = 20,
+                    Name = createWalletDTO.CurrencyName,
+                    CurrencyCode = createWalletDTO.CurrencyName,
+                    CurrencyRate = createWalletDTO.CurrencyRate,
                 }
             };
             _context.Wallets.Add(wallet);
@@ -36,8 +36,27 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        [Route("getwallets")]
+        [HttpGet("{Id}")]
+        public ActionResult<WalletDTO> GetWalletDetails(Guid Id)
+        {
+            var wallet = _context.Wallets.Include(x => x.Currency).FirstOrDefault(x => x.Id == Id);
+
+            if (wallet == null)
+            {
+                return NotFound();
+            }
+
+            var dto = new WalletDTO()
+            {
+                Id = wallet.Id.ToString(),
+                Currency = wallet.Currency.Name,
+                Type = wallet.Type,
+                Amount = wallet.Amount,
+            };
+            return Ok(dto);
+        }
+
+        [HttpGet("getwallets")]
         public async Task<List<WalletDTO>> GetWallets()
         {
             var wallets = await _context.Wallets.Include(x => x.Currency).ToListAsync();

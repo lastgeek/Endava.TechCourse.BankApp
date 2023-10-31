@@ -1,14 +1,15 @@
-﻿<h3>Wallet</h3>
-@page "/wallet"
+﻿@page "/wallet"
 @inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
 
 <PageTitle>All wallets</PageTitle>
 
-
-<br />
-<br />
-
-<MudTable Items="@wallets">
+<MudTable Items="@wallets" T="WalletDTO" OnRowClick="OnRowClick">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">All wallets</MudText>
+        <MudSpacer />
+        <MudIconButton Href="/wallet/create_wallet" Icon="@Icons.Material.Filled.Add" aria-label="create wallet"></MudIconButton>
+    </ToolBarContent>
     <HeaderContent>
         <MudTh>Type</MudTh>
         <MudTh>Amount</MudTh>
@@ -18,12 +19,16 @@
         <MudTd>@context.Type</MudTd>
         <MudTd>@context.Amount</MudTd>
         <MudTd>@context.Currency</MudTd>
-
     </RowTemplate>
 </MudTable>
 
 @code {
     List<WalletDTO> wallets;
+
+    void OnRowClick(TableRowClickEventArgs<WalletDTO> args)
+    {
+        NavigationManager.NavigateTo("/wallet/" + args.Item.Id);
+    }
 
     protected override async Task OnInitializedAsync()
     {
