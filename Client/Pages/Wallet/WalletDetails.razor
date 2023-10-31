@@ -1,0 +1,26 @@
+﻿<h3>Wallet Details</h3>
+@page "/wallet/{Id}"
+@inject HttpClient HttpClient
+
+<PageTitle>Wallet Details</PageTitle>
+
+@if (wallet != null)
+{
+    <MudText><b>Amount:</b> @wallet.Amount</MudText>
+    <MudText><b>Currency:</b> @wallet.Currency</MudText>
+    <MudText><b>Type:</b> @wallet.Type</MudText>
+}
+else
+{
+    <MudText>Wallet not found.</MudText>
+}
+
+@code {
+    [Parameter] public string Id { get; set; }
+    WalletDTO wallet;
+
+    protected override async Task OnInitializedAsync()
+    {
+        wallet = await HttpClient.GetFromJsonAsync<WalletDTO>($"https://localhost:7100/api/wallet/{Id}");
+    }
+}
