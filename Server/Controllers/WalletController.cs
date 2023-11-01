@@ -14,6 +14,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
 
         public WalletController(ApplicationDbContext dbContext)
         {
+            ArgumentNullException.ThrowIfNull(dbContext);
             _context = dbContext;
         }
 
