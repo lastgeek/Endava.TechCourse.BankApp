@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Endava.TechCourse.BankApp.Domain\Endava.TechCourse.BankApp.Domain.csproj" />
     <ProjectReference Include="..\Shared\Endava.TechCourse.BankApp.Shared.csproj" />
   </ItemGroup>
 

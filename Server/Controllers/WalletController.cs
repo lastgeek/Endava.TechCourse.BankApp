@@ -1,6 +1,8 @@
-﻿using Endava.TechCourse.BankApp.Domain.Models;
+﻿using Endava.TechCourse.BankApp.Application.Commands.CreateWallet;
+using Endava.TechCourse.BankApp.Application.Queries.GetWallets;
 using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using Endava.TechCourse.BankApp.Shared;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,41 +13,34 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
     public class WalletController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMediator _mediator;
 
-        public WalletController(ApplicationDbContext dbContext)
+        public WalletController(ApplicationDbContext dbContext, IMediator mediator)
         {
             ArgumentNullException.ThrowIfNull(dbContext);
+            ArgumentNullException.ThrowIfNull(mediator);
             _context = dbContext;
+            _mediator = mediator;
         }
 
         [HttpPost]
         public IActionResult CreateWallet([FromBody] CreateWalletDTO createWalletDTO)
         {
-            var wallet = new Wallet
+            var command = new CreateWalletCommand()
             {
                 Type = createWalletDTO.Type,
                 Amount = createWalletDTO.Amount,
-                Currency = new Currency
-                {
-                    Name = createWalletDTO.CurrencyName,
-                    CurrencyCode = createWalletDTO.CurrencyName,
-                    CurrencyRate = createWalletDTO.CurrencyRate,
-                }
+                CurrencyCode = createWalletDTO.CurrencyCode,
             };
-            _context.Wallets.Add(wallet);
-            _context.SaveChanges();
+
+            _mediator.Send(command);
             return Ok();
         }
 
-        [HttpGet("{Id}")]
-        public ActionResult<WalletDTO> GetWalletDetails(Guid Id)
+        [HttpGet("{id}")]
+        public async Task<WalletDTO?> GetWalletById(Guid id)
         {
-            var wallet = _context.Wallets.Include(x => x.Currency).FirstOrDefault(x => x.Id == Id);
-
-            if (wallet == null)
-            {
-                return NotFound();
-            }
+            var wallet = await _context.Wallets.Include(w => w.Currency).FirstOrDefaultAsync(w => w.Id == id);
 
             var dto = new WalletDTO()
             {
@@ -54,13 +49,15 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                 Type = wallet.Type,
                 Amount = wallet.Amount,
             };
-            return Ok(dto);
+            return dto;
         }
 
         [HttpGet("getwallets")]
         public async Task<List<WalletDTO>> GetWallets()
         {
-            var wallets = await _context.Wallets.Include(x => x.Currency).ToListAsync();
+            var query = new GetWalletsQuery();
+
+            var wallets = await _mediator.Send(query);
             var dtos = new List<WalletDTO>();
 
             foreach (var wallet in wallets)
@@ -68,7 +65,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                 var dto = new WalletDTO()
                 {
                     Id = wallet.Id.ToString(),
-                    Currency = wallet.Currency.Name,
+                    Currency = wallet.Currency.CurrencyCode,
                     Type = wallet.Type,
                     Amount = wallet.Amount,
                 };
