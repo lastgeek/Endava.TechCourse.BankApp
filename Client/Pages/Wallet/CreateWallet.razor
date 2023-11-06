@@ -10,10 +10,17 @@
         <MudText Align="Align.Center" Class="mb-n4">Create wallet</MudText>
         <br/>
         <MudForm @bind-IsValid="@success">
-            <MudTextField @bind-Value="TypeValue" Label="Type" Required="true" RequiredError="Type is required!" />
+            <MudTextField @bind-Value="WalletType" Label="Type" Required="true" RequiredError="Type is required!" />
             <MudTextField @bind-Value="AmountValue" Label="Amount" Required="true" RequiredError="Amount is required!" />
-            <MudTextField @bind-Value="CurrencyName" Label="Currency" Required="true" RequiredError="Currency is required!" />
-            <MudTextField @bind-Value="CurrencyRate" Validation="@(new Func<decimal, IEnumerable<string>>(CurrencyRateValidation))" Label="Currency Rate" Required="true" RequiredError="Currency Rate is required!" />
+            <MudSelect T="string" @bind-Value="CurrencyCode" RequiredError="Currency is required!" Label="Currency" AnchorOrigin="Origin.BottomCenter">
+                @if (currencies != null)
+                {
+                    foreach (var item in currencies)
+                    {
+                        <MudSelectItem T="string" Value="@item.CurrencyCode">@item.Name</MudSelectItem>
+                    }
+                }
+            </MudSelect>
             <br/>
             <div class="d-flex align-center justify-space-between">
                 <MudButton Disabled="@(!success)" Variant="Variant.Text" Class="ml-auto" Color="Color.Primary" OnClick="() => CreateNewWallet()">Create</MudButton>
@@ -24,26 +31,19 @@
 
 
 @code {
+    List<CurrencyDTO> currencies;
     bool success;
-    public string TypeValue { get; set; }
+    public string WalletType { get; set; }
     public decimal AmountValue { get; set; }
-    public string CurrencyName { get; set; }
-    public decimal CurrencyRate { get; set; } = 1;
-
-    private IEnumerable<string> CurrencyRateValidation(decimal cr)
-    {
-        if (cr <= 0.0m)
-            yield return "Currency rates cannot be equal to or less than 0";
-    }
+    public string CurrencyCode { get; set; }
 
     async Task CreateNewWallet()
     {
         var newWallet = new CreateWalletDTO
             {
-                Type = TypeValue,
+                Type = WalletType,
                 Amount = AmountValue,
-                CurrencyName = CurrencyName,
-                CurrencyRate = CurrencyRate
+                CurrencyCode = CurrencyCode,
             };
 
         var content = new StringContent(JsonSerializer.Serialize(newWallet), System.Text.Encoding.UTF8, "application/json");
@@ -59,4 +59,8 @@
         }
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        currencies = await HttpClient.GetFromJsonAsync<List<CurrencyDTO>>($"https://localhost:7100/api/currencies");
+    }
 }

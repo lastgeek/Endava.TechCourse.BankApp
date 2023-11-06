@@ -1,14 +1,20 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider Theme="Theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
     <MudAppBar Elevation="0" Color="Color.Primary">
-        <h2>Endava Tech Course Bank App | </h2>
+        <h2>Endava University Bank App | </h2>
         <MudButton Href="/" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">Main Page</MudButton>
         <MudButton Href="/wallet" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">All Wallets</MudButton>
+        <MudButton Href="/user-panel" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">User Panel</MudButton>
+        <MudButton Href="/admin-panel" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">Admin Panel</MudButton>
+
+        <MudSpacer />
+        <MudButton Href="/login" Variant="Variant.Filled" DisableElevation="true" Color="Color.Tertiary" Class="mr-4">Sign in</MudButton>
+        <MudButton Href="/register" Variant="Variant.Filled" DisableElevation="true" Color="Color.Secondary" Class="mr-4">Sign up</MudButton>
     </MudAppBar>
 
     <MudMainContent>
