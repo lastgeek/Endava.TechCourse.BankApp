@@ -4,11 +4,11 @@ using MediatR;
 
 namespace Endava.TechCourse.BankApp.Application.Commands.CreateWallet
 {
-    public class CreateWalletCommandHandler : IRequestHandler<CreateWalletCommand>
+    public class CreateWalletHandler : IRequestHandler<CreateWalletCommand>
     {
         private readonly ApplicationDbContext _context;
 
-        public CreateWalletCommandHandler(ApplicationDbContext context)
+        public CreateWalletHandler(ApplicationDbContext context)
         {
             _context = context;
         }

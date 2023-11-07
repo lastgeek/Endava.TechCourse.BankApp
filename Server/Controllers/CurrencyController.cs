@@ -1,9 +1,11 @@
 ﻿using Endava.TechCourse.BankApp.Application.Commands.AddCurrency;
+using Endava.TechCourse.BankApp.Application.Commands.DeleteCurrency;
+using Endava.TechCourse.BankApp.Application.Queries.GetCurrencies;
+using Endava.TechCourse.BankApp.Application.Queries.GetCurrencyById;
 using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using Endava.TechCourse.BankApp.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Endava.TechCourse.BankApp.Server.Controllers
 {
@@ -22,6 +24,22 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             _mediator = mediator;
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCurrency(Guid id)
+        {
+            var command = new DeleteCurrencyCommand { CurrencyId = id };
+            var result = await _mediator.Send(command);
+
+            if (result)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddCurrency([FromBody] CurrencyDTO currencyDTO)
         {
@@ -37,10 +55,35 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             return result.IsSuccessful ? Ok(result) : BadRequest(result.Error);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCurrencyById(Guid id)
+        {
+            var query = new GetCurrencyByIdQuery { CurrencyId = id };
+            var currency = await _mediator.Send(query);
+
+            if (currency == null)
+            {
+                return NotFound();
+            }
+
+            var dto = new CurrencyDTO()
+            {
+                CanBeRemoved = true,
+                ChangeRate = currency.CurrencyRate,
+                CurrencyCode = currency.CurrencyCode,
+                Id = currency.Id.ToString(),
+                Name = currency.Name,
+            };
+
+            return Ok(dto);
+        }
+
         [HttpGet]
         public async Task<List<CurrencyDTO>> GetCurrencies()
         {
-            var currencies = await _context.Currency.ToListAsync();
+            var query = new GetCurrenciesQuery();
+
+            var currencies = await _mediator.Send(query);
             var dtos = new List<CurrencyDTO>();
 
             foreach (var currency in currencies)
@@ -53,10 +96,8 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                     Id = currency.Id.ToString(),
                     Name = currency.Name,
                 };
-
                 dtos.Add(dto);
             }
-
             return dtos;
         }
     }

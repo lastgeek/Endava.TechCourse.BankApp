@@ -1,10 +1,10 @@
 ﻿using Endava.TechCourse.BankApp.Application.Commands.CreateWallet;
+using Endava.TechCourse.BankApp.Application.Commands.DeleteWallet;
 using Endava.TechCourse.BankApp.Application.Queries.GetWallets;
 using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using Endava.TechCourse.BankApp.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Endava.TechCourse.BankApp.Server.Controllers
 {
@@ -37,19 +37,41 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             return Ok();
         }
 
-        [HttpGet("{id}")]
-        public async Task<WalletDTO?> GetWalletById(Guid id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteWallet(Guid id)
         {
-            var wallet = await _context.Wallets.Include(w => w.Currency).FirstOrDefaultAsync(w => w.Id == id);
+            var command = new DeleteWalletCommand { WalletId = id };
+            var result = await _mediator.Send(command);
+
+            if (result)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<WalletDTO>> GetWalletById(Guid id)
+        {
+            var command = new GetWalletByIdQuery { Id = id };
+            var wallet = await _mediator.Send(command);
+            if (wallet == null)
+            {
+                return NotFound();
+            }
 
             var dto = new WalletDTO()
             {
                 Id = wallet.Id.ToString(),
-                Currency = wallet.Currency.Name,
+                Currency = wallet.Currency.CurrencyCode,
                 Type = wallet.Type,
                 Amount = wallet.Amount,
             };
-            return dto;
+
+            return Ok(dto);
         }
 
         [HttpGet("getwallets")]
