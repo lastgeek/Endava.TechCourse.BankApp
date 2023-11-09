@@ -1,4 +1,5 @@
 ﻿using Endava.TechCourse.BankApp.Domain.Models;
+using Endava.TechCourse.BankApp.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace Endava.TechCourse.BankApp.Infrastracture.Persistance
                 .IsRequired();
 
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
         }
     }
 }
