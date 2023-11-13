@@ -1,5 +1,6 @@
 ﻿using Endava.TechCourse.BankApp.Application.Commands.CreateWallet;
 using Endava.TechCourse.BankApp.Application.Commands.DeleteWallet;
+using Endava.TechCourse.BankApp.Application.Commands.UpdateWallet;
 using Endava.TechCourse.BankApp.Application.Queries.GetWallets;
 using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using Endava.TechCourse.BankApp.Shared;
@@ -24,7 +25,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateWallet([FromBody] CreateWalletDTO createWalletDTO)
+        public async Task<IActionResult> CreateWallet([FromBody] CreateWalletDTO createWalletDTO)
         {
             var command = new CreateWalletCommand()
             {
@@ -33,7 +34,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                 CurrencyCode = createWalletDTO.CurrencyCode,
             };
 
-            _mediator.Send(command);
+            await _mediator.Send(command);
             return Ok();
         }
 
@@ -50,6 +51,28 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             else
             {
                 return NotFound();
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateWallet(Guid id, [FromBody] UpdateWalletDTO updateWalletDTO)
+        {
+            var command = new UpdateWalletCommand
+            {
+                WalletId = id,
+                Type = updateWalletDTO.Type,
+                Amount = updateWalletDTO.Amount,
+                CurrencyCode = updateWalletDTO.CurrencyCode,
+            };
+
+            try
+            {
+                await _mediator.Send(command);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
             }
         }
 

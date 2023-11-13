@@ -1,5 +1,6 @@
 ﻿using Endava.TechCourse.BankApp.Application.Commands.AddCurrency;
 using Endava.TechCourse.BankApp.Application.Commands.DeleteCurrency;
+using Endava.TechCourse.BankApp.Application.Commands.UpdateCurrency;
 using Endava.TechCourse.BankApp.Application.Queries.GetCurrencies;
 using Endava.TechCourse.BankApp.Application.Queries.GetCurrencyById;
 using Endava.TechCourse.BankApp.Infrastracture.Persistance;
@@ -53,6 +54,14 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             var result = await _mediator.Send(command);
 
             return result.IsSuccessful ? Ok(result) : BadRequest(result.Error);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCurrency(Guid id, [FromBody] UpdateCurrencyCommand command)
+        {
+            command.Id = id;
+            await _mediator.Send(command);
+            return Ok();
         }
 
         [HttpGet("{id}")]
