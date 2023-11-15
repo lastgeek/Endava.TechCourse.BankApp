@@ -1,6 +1,7 @@
 using Endava.TechCourse.BankApp.Application.Commands.CreateWallet;
 using Endava.TechCourse.BankApp.Application.Queries.GetWallets;
 using Endava.TechCourse.BankApp.Infrastructure;
+using Endava.TechCourse.BankApp.Server.Composition;
 
 namespace Endava.TechCourse.BankApp
 {
@@ -21,6 +22,7 @@ namespace Endava.TechCourse.BankApp
             });
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
+            builder.Services.AddJwtIdentity(configuration);
 
             var app = builder.Build();
 

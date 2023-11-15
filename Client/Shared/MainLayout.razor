@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject AuthService authService
 
 <MudThemeProvider Theme="Theme" />
 <MudDialogProvider />
@@ -8,13 +9,27 @@
     <MudAppBar Elevation="0" Color="Color.Primary">
         <h2>Endava University Bank App | </h2>
         <MudButton Href="/" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">Main Page</MudButton>
-        <MudButton Href="/wallet" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">All Wallets</MudButton>
-        <MudButton Href="/user-panel" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">User Panel</MudButton>
-        <MudButton Href="/admin-panel" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">Admin Panel</MudButton>
-
-        <MudSpacer />
-        <MudButton Href="/login" Variant="Variant.Filled" DisableElevation="true" Color="Color.Tertiary" Class="mr-4">Sign in</MudButton>
-        <MudButton Href="/register" Variant="Variant.Filled" DisableElevation="true" Color="Color.Secondary" Class="mr-4">Sign up</MudButton>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MudButton Href="/admin-panel" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">Admin Panel</MudButton>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="User">
+            <Authorized>
+                <MudButton Href="/user-panel" Variant="Variant.Text" Style=@($"color:{Theme.PaletteDark.White}") Class="ml-4">User Panel</MudButton>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView>
+            <Authorized>
+                <MudSpacer />
+                <MudButton Href="/" OnClick="Logout" Variant="Variant.Filled" DisableElevation="true" Color="Color.Tertiary" Class="mr-4">Logout</MudButton>
+            </Authorized>
+            <NotAuthorized>
+                <MudSpacer />
+                <MudButton Href="/login" Variant="Variant.Filled" DisableElevation="true" Color="Color.Tertiary" Class="mr-4">Sign in</MudButton>
+                <MudButton Href="/register" Variant="Variant.Filled" DisableElevation="true" Color="Color.Secondary" Class="mr-4">Sign up</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudAppBar>
 
     <MudMainContent>
@@ -27,7 +42,6 @@
     </MudMainContent>
 </MudLayout>
 
-
 @code {
     private MudTheme Theme = new MudTheme()
         {
@@ -36,4 +50,6 @@
                 Tertiary = Colors.DeepPurple.Darken4
             },
         };
+
+    private async Task Logout() => await authService.Logout();
 }
