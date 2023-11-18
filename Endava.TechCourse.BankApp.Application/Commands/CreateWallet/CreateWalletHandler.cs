@@ -24,7 +24,8 @@ namespace Endava.TechCourse.BankApp.Application.Commands.CreateWallet
             {
                 Type = request.Type,
                 Amount = request.Amount,
-                Currency = currency
+                Currency = currency,
+                UserId = new Guid(request.UserId)
             };
 
             await _context.Wallets.AddAsync(wallet, cancellationToken);

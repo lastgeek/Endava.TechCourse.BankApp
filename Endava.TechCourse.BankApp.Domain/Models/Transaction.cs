@@ -2,7 +2,7 @@
 
 namespace Endava.TechCourse.BankApp.Domain.Models
 {
-    internal class Transaction : BaseEntity
+    public class Transaction : BaseEntity
     {
         public Guid SourceWalletId { get; set; }
         public string SourceUserId { get; set; }

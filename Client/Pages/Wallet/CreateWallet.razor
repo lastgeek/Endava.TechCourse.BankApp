@@ -2,6 +2,7 @@
 @using System.Text.Json;
 @inject HttpClient HttpClient
 @inject ISnackbar Snackbar
+@inject AuthService authService
 
 <PageTitle>Create wallet</PageTitle>
 
@@ -44,6 +45,7 @@
                 Type = WalletType,
                 Amount = AmountValue,
                 CurrencyCode = CurrencyCode,
+                UserId = await authService.GetUserId()
             };
 
         var content = new StringContent(JsonSerializer.Serialize(newWallet), System.Text.Encoding.UTF8, "application/json");

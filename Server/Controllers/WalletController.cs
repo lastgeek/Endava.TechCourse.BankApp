@@ -32,6 +32,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                 Type = createWalletDTO.Type,
                 Amount = createWalletDTO.Amount,
                 CurrencyCode = createWalletDTO.CurrencyCode,
+                UserId = createWalletDTO.UserId
             };
 
             await _mediator.Send(command);
@@ -97,8 +98,8 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             return Ok(dto);
         }
 
-        [HttpGet("getwallets")]
-        public async Task<List<WalletDTO>> GetWallets()
+        [HttpGet("getwallets/{userId}")]
+        public async Task<List<WalletDTO>> GetWallets(Guid userId)
         {
             var query = new GetWalletsQuery();
 
@@ -107,14 +108,17 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
 
             foreach (var wallet in wallets)
             {
-                var dto = new WalletDTO()
+                if (wallet.UserId == userId)
                 {
-                    Id = wallet.Id.ToString(),
-                    Currency = wallet.Currency.CurrencyCode,
-                    Type = wallet.Type,
-                    Amount = wallet.Amount,
-                };
-                dtos.Add(dto);
+                    var dto = new WalletDTO()
+                    {
+                        Id = wallet.Id.ToString(),
+                        Currency = wallet.Currency.CurrencyCode,
+                        Type = wallet.Type,
+                        Amount = wallet.Amount,
+                    };
+                    dtos.Add(dto);
+                }
             }
             return dtos;
         }

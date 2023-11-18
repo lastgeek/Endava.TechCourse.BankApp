@@ -14,10 +14,14 @@ namespace Endava.TechCourse.BankApp.Infrastracture.Persistance
 
         public DbSet<Wallet> Wallets { get; set; }
 
+        public DbSet<Transaction> Transactions { get; set; }
+
         public DbSet<Currency> Currency { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Transaction>().HasKey(e => e.Id);
+
             modelBuilder.Entity<Currency>().HasKey(e => e.Id);
 
             modelBuilder.Entity<Wallet>().HasKey(e => e.Id);
