@@ -61,9 +61,8 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             var command = new UpdateWalletCommand
             {
                 WalletId = id,
-                Type = updateWalletDTO.Type,
-                Amount = updateWalletDTO.Amount,
-                CurrencyCode = updateWalletDTO.CurrencyCode,
+                UpdateAmount = updateWalletDTO.Amount,
+                Currency = updateWalletDTO.CurrencyId
             };
 
             try
@@ -92,7 +91,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                 Id = wallet.Id.ToString(),
                 Currency = wallet.Currency.CurrencyCode,
                 Type = wallet.Type,
-                Amount = wallet.Amount,
+                Amount = wallet.Amount
             };
 
             return Ok(dto);
@@ -115,7 +114,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                         Id = wallet.Id.ToString(),
                         Currency = wallet.Currency.CurrencyCode,
                         Type = wallet.Type,
-                        Amount = wallet.Amount,
+                        Amount = wallet.Amount
                     };
                     dtos.Add(dto);
                 }

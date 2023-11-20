@@ -1,6 +1,7 @@
 ﻿<h3>Wallet Details</h3>
 @page "/wallet/{Id}"
 @inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
 
 <PageTitle>Wallet Details</PageTitle>
 
@@ -9,6 +10,26 @@
     <MudText><b>Amount:</b> @wallet.Amount</MudText>
     <MudText><b>Currency:</b> @wallet.Currency</MudText>
     <MudText><b>Type:</b> @wallet.Type</MudText>
+    <br />
+    <MudTable Items="@transactions" T="WalletTransactionDTO">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Transactions</MudText>
+            <MudSpacer />
+            <MudIconButton OnClick="MakeTransaction" Icon="@Icons.Material.Filled.Add" aria-label="create wallet"></MudIconButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Sender wallet</MudTh>
+            <MudTh>Receiver wallet</MudTh>
+            <MudTh>Amount</MudTh>
+            <MudTh>Currency</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.SenderWalletId</MudTd>
+            <MudTd>@context.ReceiverWalletId</MudTd>
+            <MudTd>@context.Amount</MudTd>
+            <MudTd>@context.CurrencyCode</MudTd>
+        </RowTemplate>
+    </MudTable>
 }
 else
 {
@@ -17,10 +38,17 @@ else
 
 @code {
     [Parameter] public string Id { get; set; }
+    List<WalletTransactionDTO> transactions;
     WalletDTO wallet;
+
+    void MakeTransaction()
+    {
+        NavigationManager.NavigateTo("/wallet/" + Id + "/transaction");
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        transactions = await HttpClient.GetFromJsonAsync<List<WalletTransactionDTO>>($"https://localhost:7100/api/transaction/{Id}");
         wallet = await HttpClient.GetFromJsonAsync<WalletDTO>($"https://localhost:7100/api/wallet/{Id}");
     }
 }
