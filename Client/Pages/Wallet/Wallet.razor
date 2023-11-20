@@ -1,6 +1,7 @@
 ﻿@page "/wallet"
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@inject AuthService authService
 
 <PageTitle>All wallets</PageTitle>
 
@@ -32,6 +33,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        wallets = await HttpClient.GetFromJsonAsync<List<WalletDTO>>($"https://localhost:7100/api/wallet/getwallets");
+        var userId = await authService.GetUserId();
+        if (userId == null)
+            NavigationManager.NavigateTo("/");
+        else
+            wallets = await HttpClient.GetFromJsonAsync<List<WalletDTO>>($"https://localhost:7100/api/wallet/getwallets/{userId}");
     }
 }

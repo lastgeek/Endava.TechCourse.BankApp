@@ -8,5 +8,6 @@ namespace Endava.TechCourse.BankApp.Domain.Models
         public decimal Amount { get; set; }
         public Currency Currency { get; set; }
         public Guid CurrencyId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

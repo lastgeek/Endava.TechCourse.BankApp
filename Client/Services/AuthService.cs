@@ -86,5 +86,25 @@ namespace Endava.TechCourse.BankApp.Client.Services
 
             return true;
         }
+
+        public async Task<string> GetUserId()
+        {
+            var token = await localStorage.GetItemAsync<string>("authToken");
+
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                var claims = JwtParser.ParseClaimsFromJwt(token);
+
+                var userIdClaim = claims.FirstOrDefault(c => c.Type == "userId");
+
+                if (userIdClaim != null)
+                {
+                    var userId = userIdClaim.Value;
+                    return userId;
+                }
+            }
+
+            return null;
+        }
     }
 }

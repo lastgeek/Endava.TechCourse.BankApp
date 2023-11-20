@@ -15,25 +15,14 @@ namespace Endava.TechCourse.BankApp.Application.Commands.UpdateWallet
 
         public async Task Handle(UpdateWalletCommand request, CancellationToken cancellationToken)
         {
-            var wallet = await _context.Wallets.FindAsync(request.WalletId);
+            var wallet = await _context.Wallets.FirstOrDefaultAsync(w => w.Id == request.WalletId);
+            var currency = await _context.Currency.FirstOrDefaultAsync(c => c.Id == request.Currency);
+            var walletCurrency = await _context.Currency.FirstOrDefaultAsync(c => c.Id == wallet.CurrencyId);
 
-            if (wallet == null)
-            {
-                throw new Exception("Wallet not found");
-            }
+            var conversedAmount = request.UpdateAmount * currency.CurrencyRate;
+            conversedAmount /= walletCurrency.CurrencyRate;
 
-            wallet.Type = request.Type;
-            wallet.Amount = request.Amount;
-
-            if (!string.IsNullOrEmpty(request.CurrencyCode))
-            {
-                var currency = await _context.Currency.FirstOrDefaultAsync(c => c.CurrencyCode == request.CurrencyCode);
-                if (currency == null)
-                {
-                    throw new Exception("Currency not found");
-                }
-                wallet.Currency = currency;
-            }
+            wallet.Amount += conversedAmount;
 
             await _context.SaveChangesAsync(cancellationToken);
         }

@@ -4,6 +4,7 @@ using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231119025633_UpdateModels")]
+    partial class UpdateModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,8 +56,9 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("CurrencyId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DestinationUserId")
                         .IsRequired()
@@ -71,8 +75,6 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CurrencyId");
 
                     b.ToTable("Transactions");
                 });
@@ -207,13 +209,13 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("67c5d988-043e-4c36-b565-7cf2a5b92912"),
+                            Id = new Guid("715e613c-d2e5-4748-9f25-1f53a9670963"),
                             Name = "User",
                             NormalizedName = "User"
                         },
                         new
                         {
-                            Id = new Guid("0bda9b2d-51b4-4e0c-b5df-b7dcb23d5fbc"),
+                            Id = new Guid("7026f9b1-1d65-4e94-85e3-f5b8c25e9403"),
                             Name = "Admin",
                             NormalizedName = "Admin"
                         });
@@ -320,17 +322,6 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Endava.TechCourse.BankApp.Domain.Models.Transaction", b =>
-                {
-                    b.HasOne("Endava.TechCourse.BankApp.Domain.Models.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Endava.TechCourse.BankApp.Domain.Models.Wallet", b =>
