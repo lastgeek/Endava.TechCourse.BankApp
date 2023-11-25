@@ -15,7 +15,7 @@ namespace Endava.TechCourse.BankApp.Application.Commands.UpdateWallet
 
         public async Task Handle(UpdateWalletCommand request, CancellationToken cancellationToken)
         {
-            var wallet = await _context.Wallets.FirstOrDefaultAsync(w => w.Id == request.WalletId);
+            var wallet = await _context.Wallets.FirstOrDefaultAsync(w => w.Code == request.WalletCode);
             var currency = await _context.Currency.FirstOrDefaultAsync(c => c.Id == request.Currency);
             var walletCurrency = await _context.Currency.FirstOrDefaultAsync(c => c.Id == wallet.CurrencyId);
 

@@ -23,8 +23,8 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
         {
             var command = new MakeTransactionCommand()
             {
-                SenderWalletId = walletTransactionDTO.SenderWalletId,
-                ReceiverWalletId = walletTransactionDTO.ReceiverWalletId,
+                SenderWalletCode = walletTransactionDTO.SenderWalletCode,
+                ReceiverWalletCode = walletTransactionDTO.ReceiverWalletCode,
                 Amount = walletTransactionDTO.Amount,
                 CurrencyId = walletTransactionDTO.CurrencyId
             };
@@ -33,41 +33,28 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             return Ok();
         }
 
-        [HttpGet("{walletId}")]
-        public async Task<List<WalletTransactionDTO>> GetTransaction(Guid walletId)
+        [HttpGet("{walletCode}")]
+        public async Task<List<WalletTransactionDTO>> GetTransaction(string walletCode)
         {
-            var query = new GetTransactionQuery();
+            var query = new GetTransactionQuery { walletCode = walletCode };
 
             var transactions = await _mediator.Send(query);
             var dtos = new List<WalletTransactionDTO>();
 
             foreach (var transaction in transactions)
             {
-                if (transaction.SourceWalletId == walletId)
+                var dto = new WalletTransactionDTO()
                 {
-                    var dto = new WalletTransactionDTO()
-                    {
-                        SenderWalletId = transaction.SourceWalletId,
-                        ReceiverWalletId = transaction.DestinationWalletId,
-                        Amount = -transaction.Amount,
-                        CurrencyCode = transaction.Currency.CurrencyCode
-                    };
-                    dtos.Add(dto);
-                }
-                else if (transaction.DestinationWalletId == walletId)
-                {
-                    var dto = new WalletTransactionDTO()
-                    {
-                        SenderWalletId = transaction.SourceWalletId,
-                        ReceiverWalletId = transaction.DestinationWalletId,
-                        Amount = transaction.Amount,
-                        CurrencyCode = transaction.Currency.CurrencyCode
-                    };
-                    dtos.Add(dto);
-                }
+                    SenderWalletCode = transaction.SourceWalletCode,
+                    ReceiverWalletCode = transaction.DestinationWalletCode,
+                    Amount = walletCode == transaction.SourceWalletCode ? -transaction.Amount : transaction.Amount,
+                    CurrencyCode = transaction.Currency.CurrencyCode,
+                    CreationDate = transaction.CreationDate
+                };
+                dtos.Add(dto);
             }
 
-            return dtos;
+            return dtos.OrderByDescending(x => x.CreationDate).ToList();
         }
     }
 }

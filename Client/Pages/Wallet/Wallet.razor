@@ -12,14 +12,14 @@
         <MudIconButton Href="/wallet/create_wallet" Icon="@Icons.Material.Filled.Add" aria-label="create wallet"></MudIconButton>
     </ToolBarContent>
     <HeaderContent>
+        <MudTh>Code</MudTh>
         <MudTh>Type</MudTh>
         <MudTh>Amount</MudTh>
-        <MudTh>Currency</MudTh>
     </HeaderContent>
     <RowTemplate>
+        <MudTd>**** @context.Code.Substring(11, 4)</MudTd>
         <MudTd>@context.Type</MudTd>
-        <MudTd>@context.Amount</MudTd>
-        <MudTd>@context.Currency</MudTd>
+        <MudTd>@context.Amount @context.Currency</MudTd>
     </RowTemplate>
 </MudTable>
 
@@ -37,6 +37,6 @@
         if (userId == null)
             NavigationManager.NavigateTo("/");
         else
-            wallets = await HttpClient.GetFromJsonAsync<List<WalletDTO>>($"https://localhost:7100/api/wallet/getwallets/{userId}");
+            wallets = await HttpClient.GetFromJsonAsync<List<WalletDTO>>($"/api/wallet/getwallets/{userId}");
     }
 }

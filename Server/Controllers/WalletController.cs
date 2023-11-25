@@ -2,7 +2,7 @@
 using Endava.TechCourse.BankApp.Application.Commands.DeleteWallet;
 using Endava.TechCourse.BankApp.Application.Commands.UpdateWallet;
 using Endava.TechCourse.BankApp.Application.Queries.GetWallets;
-using Endava.TechCourse.BankApp.Infrastracture.Persistance;
+using Endava.TechCourse.BankApp.Server.Services;
 using Endava.TechCourse.BankApp.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,22 +13,25 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
     [ApiController]
     public class WalletController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly IMediator _mediator;
+        private readonly WalletService _walletService;
 
-        public WalletController(ApplicationDbContext dbContext, IMediator mediator)
+        public WalletController(IMediator mediator, WalletService walletService)
         {
-            ArgumentNullException.ThrowIfNull(dbContext);
             ArgumentNullException.ThrowIfNull(mediator);
-            _context = dbContext;
+            ArgumentNullException.ThrowIfNull(walletService);
             _mediator = mediator;
+            _walletService = walletService;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateWallet([FromBody] CreateWalletDTO createWalletDTO)
         {
+            var walletCode = await _walletService.GenerateUniqueWalletCode();
+
             var command = new CreateWalletCommand()
             {
+                Code = walletCode,
                 Type = createWalletDTO.Type,
                 Amount = createWalletDTO.Amount,
                 CurrencyCode = createWalletDTO.CurrencyCode,
@@ -55,12 +58,12 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateWallet(Guid id, [FromBody] UpdateWalletDTO updateWalletDTO)
+        [HttpPut("{code}")]
+        public async Task<IActionResult> UpdateWallet(string code, [FromBody] UpdateWalletDTO updateWalletDTO)
         {
             var command = new UpdateWalletCommand
             {
-                WalletId = id,
+                WalletCode = code,
                 UpdateAmount = updateWalletDTO.Amount,
                 Currency = updateWalletDTO.CurrencyId
             };
@@ -83,43 +86,50 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             var wallet = await _mediator.Send(command);
             if (wallet == null)
             {
-                return NotFound();
+                return NotFound("Wallet not found");
             }
 
             var dto = new WalletDTO()
             {
                 Id = wallet.Id.ToString(),
-                Currency = wallet.Currency.CurrencyCode,
+                Code = wallet.Code,
+                Currency = wallet.Currency?.CurrencyCode,
                 Type = wallet.Type,
-                Amount = wallet.Amount
+                Amount = wallet.Amount,
+                MainWallet = wallet.MainWallet
             };
 
             return Ok(dto);
         }
 
         [HttpGet("getwallets/{userId}")]
-        public async Task<List<WalletDTO>> GetWallets(Guid userId)
+        public async Task<ActionResult<List<WalletDTO>>> GetWallets(Guid userId)
         {
-            var query = new GetWalletsQuery();
-
+            var query = new GetWalletsQuery { UserId = userId };
             var wallets = await _mediator.Send(query);
+
+            if (wallets == null)
+            {
+                return NotFound("Wallets not found");
+            }
+
             var dtos = new List<WalletDTO>();
 
             foreach (var wallet in wallets)
             {
-                if (wallet.UserId == userId)
+                var dto = new WalletDTO()
                 {
-                    var dto = new WalletDTO()
-                    {
-                        Id = wallet.Id.ToString(),
-                        Currency = wallet.Currency.CurrencyCode,
-                        Type = wallet.Type,
-                        Amount = wallet.Amount
-                    };
-                    dtos.Add(dto);
-                }
+                    Id = wallet.Id.ToString(),
+                    Code = wallet.Code,
+                    Currency = wallet.Currency?.CurrencyCode,
+                    Type = wallet.Type,
+                    Amount = wallet.Amount,
+                    MainWallet = wallet.MainWallet
+                };
+                dtos.Add(dto);
             }
-            return dtos;
+
+            return Ok(dtos);
         }
     }
 }

@@ -7,9 +7,10 @@
 
 @if (wallet != null)
 {
-    <MudText><b>Amount:</b> @wallet.Amount</MudText>
-    <MudText><b>Currency:</b> @wallet.Currency</MudText>
+    <MudText><b>Code:</b> @wallet.Code</MudText>
+    <MudText><b>Amount:</b> @wallet.Amount @wallet.Currency</MudText>
     <MudText><b>Type:</b> @wallet.Type</MudText>
+    <MudText><b>Main Wallet:</b> @wallet.MainWallet</MudText>
     <br />
     <MudTable Items="@transactions" T="WalletTransactionDTO">
         <ToolBarContent>
@@ -24,8 +25,8 @@
             <MudTh>Currency</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.SenderWalletId</MudTd>
-            <MudTd>@context.ReceiverWalletId</MudTd>
+            <MudTd>@context.SenderWalletCode</MudTd>
+            <MudTd>@context.ReceiverWalletCode</MudTd>
             <MudTd>@context.Amount</MudTd>
             <MudTd>@context.CurrencyCode</MudTd>
         </RowTemplate>
@@ -43,12 +44,12 @@ else
 
     void MakeTransaction()
     {
-        NavigationManager.NavigateTo("/wallet/" + Id + "/transaction");
+        NavigationManager.NavigateTo("/wallet/transaction");
     }
 
     protected override async Task OnInitializedAsync()
     {
-        transactions = await HttpClient.GetFromJsonAsync<List<WalletTransactionDTO>>($"https://localhost:7100/api/transaction/{Id}");
         wallet = await HttpClient.GetFromJsonAsync<WalletDTO>($"https://localhost:7100/api/wallet/{Id}");
+        transactions = await HttpClient.GetFromJsonAsync<List<WalletTransactionDTO>>($"https://localhost:7100/api/transaction/{wallet.Code}");
     }
 }

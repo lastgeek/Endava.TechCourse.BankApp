@@ -1,4 +1,4 @@
-﻿@page "/wallet/{Id}/transaction"
+﻿@page "/wallet/transaction"
 @using System.Text.Json;
 @inject HttpClient HttpClient
 @inject ISnackbar Snackbar
@@ -12,7 +12,16 @@
         <MudText Align="Align.Center" Class="mb-n4">Make Transaction</MudText>
         <br />
         <MudForm @bind-IsValid="@success">
-            <MudTextField @bind-Value="WalletId" Label="Wallet Id" Required="true" RequiredError="Type is required!" />
+            <MudSelect T="string" @bind-Value="Code" RequiredError="Wallet is required!" Label="Wallet" AnchorOrigin="Origin.BottomCenter">
+                @if (wallets != null)
+                {
+                    foreach (var item in wallets)
+                    {
+                        <MudSelectItem T="string" Value="@item.Code">@item.Code</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+            <MudTextField @bind-Value="WalletCode" Label="Wallet Code" Required="true" RequiredError="Wallet is required!" />
             <MudNumericField HideSpinButtons="true" @bind-Value="AmountValue" Required="true" RequiredError="Type is required!" Label="Amount" Variant="Variant.Text" Min="1"/>
             <MudSelect T="CurrencyDTO" @bind-Value="Currency" RequiredError="Currency is required!" Label="Currency" AnchorOrigin="Origin.BottomCenter">
                 @if (currencies != null)
@@ -33,10 +42,11 @@
 
 
 @code {
-    [Parameter] public string Id { get; set; }
     List<CurrencyDTO> currencies;
+    List<WalletDTO> wallets;
     bool success;
-    public string WalletId { get; set; }
+    public string Code { get; set; }
+    public string WalletCode { get; set; }
     public decimal AmountValue { get; set; }
     public CurrencyDTO Currency { get; set; }
 
@@ -44,20 +54,20 @@
     {
         var newTransaction = new WalletTransactionDTO
             {
-                SenderWalletId = new Guid(Id),
-                ReceiverWalletId = new Guid(WalletId),
+                SenderWalletCode = Code,
+                ReceiverWalletCode = WalletCode,
                 Amount = AmountValue,
                 CurrencyId = new Guid(Currency.Id),
                 CurrencyCode = Currency.CurrencyCode
             };
 
         var content = new StringContent(JsonSerializer.Serialize(newTransaction), System.Text.Encoding.UTF8, "application/json");
-        var response = await HttpClient.PostAsync("https://localhost:7100/api/transaction", content);
+        var response = await HttpClient.PostAsync("/api/transaction", content);
 
         if (response.IsSuccessStatusCode)
         {
             Snackbar.Add("The transaction was made", Severity.Success);
-            NavigationManager.NavigateTo("/wallet/" + Id);
+            NavigationManager.NavigateTo("/wallet");
         }
         else
         {
@@ -68,5 +78,10 @@
     protected override async Task OnInitializedAsync()
     {
         currencies = await HttpClient.GetFromJsonAsync<List<CurrencyDTO>>($"https://localhost:7100/api/currencies");
+        var userId = await authService.GetUserId();
+        if (userId == null)
+            NavigationManager.NavigateTo("/");
+        else
+            wallets = await HttpClient.GetFromJsonAsync<List<WalletDTO>>($"https://localhost:7100/api/wallet/getwallets/{userId}");
     }
 }

@@ -17,7 +17,7 @@ namespace Endava.TechCourse.BankApp.Application.Queries.GetWallets
 
         public async Task<List<Wallet>> Handle(GetWalletsQuery request, CancellationToken cancellationToken)
         {
-            var wallets = await _context.Wallets.Include(w => w.Currency).AsNoTracking().ToListAsync();
+            var wallets = await _context.Wallets.Include(w => w.Currency).AsNoTracking().Where(w => w.UserId == request.UserId).ToListAsync(cancellationToken);
 
             return wallets;
         }
