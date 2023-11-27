@@ -4,6 +4,7 @@ using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231127005905_UpdWalletType")]
+    partial class UpdWalletType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,9 +57,6 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Commission")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreationDate")
@@ -250,13 +250,13 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("4cc0fc5e-6526-4c90-a339-0d12ab78febf"),
+                            Id = new Guid("494ac6ba-88e4-46e6-acce-5856181e4f93"),
                             Name = "User",
                             NormalizedName = "User"
                         },
                         new
                         {
-                            Id = new Guid("5f9422a3-c368-481c-a988-c8df2f34621c"),
+                            Id = new Guid("39db146b-b4b5-4758-90ff-8cb443e28215"),
                             Name = "Admin",
                             NormalizedName = "Admin"
                         });

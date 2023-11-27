@@ -17,6 +17,7 @@ public class GetWalletByIdQueryHandler : IRequestHandler<GetWalletByIdQuery, Wal
     {
         var wallet = await _context.Wallets
             .Include(w => w.Currency)
+            .Include(w => w.Type)
             .FirstOrDefaultAsync(w => w.Id == request.Id, cancellationToken);
 
         if (wallet == null)

@@ -1,0 +1,93 @@
+﻿@page "/wallet/email_transaction"
+@using System.Text.Json;
+@inject HttpClient HttpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject AuthService authService
+
+<PageTitle>Make Transaction</PageTitle>
+
+<MudGrid Class="d-flex align-center justify-center mud-width-full py-4">
+    <MudPaper Class="pa-4">
+        <MudText Align="Align.Center" Class="mb-n4">Make Transaction</MudText>
+        <br />
+        <MudForm @bind-IsValid="@success">
+            <MudSelect T="WalletDTO" @bind-Value="SenderWallet" RequiredError="Wallet is required!" Label="Wallet" AnchorOrigin="Origin.BottomCenter">
+                @if (wallets != null)
+                {
+                    foreach (var item in wallets)
+                    {
+                        <MudSelectItem T="WalletDTO" Value="@item">@item.Code</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+            <MudTextField @bind-Value="UserEmail" Label="User Email" Required="true" RequiredError="User email is required!" />
+            <MudNumericField HideSpinButtons="true" @bind-Value="AmountValue" Required="true" RequiredError="Type is required!" Label="Amount" Variant="Variant.Text" Min="1" />
+            <MudSelect T="CurrencyDTO" @bind-Value="Currency" RequiredError="Currency is required!" Label="Currency" AnchorOrigin="Origin.BottomCenter">
+                @if (currencies != null)
+                {
+                    foreach (var item in currencies)
+                    {
+                        <MudSelectItem T="CurrencyDTO" Value="@item">@item.Name</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+            <br />
+            <div class="d-flex align-center justify-space-between">
+                <MudButton Disabled="@(!success)" Variant="Variant.Text" Class="ml-auto" Color="Color.Primary" OnClick="() => CreateNewTransaction()">Make</MudButton>
+            </div>
+            <MudButton Variant="Variant.Text" OnClick="ByCode">Don't have email? Use code</MudButton>
+        </MudForm>
+    </MudPaper>
+</MudGrid>
+
+
+@code {
+    List<CurrencyDTO> currencies;
+    List<WalletDTO> wallets;
+    bool success;
+    public WalletDTO SenderWallet { get; set; }
+    public string UserEmail { get; set; }
+    public decimal AmountValue { get; set; }
+    public CurrencyDTO Currency { get; set; }
+
+    async Task CreateNewTransaction()
+    {
+        var newTransaction = new MakeTransactionDTO
+            {
+                SenderWallet = SenderWallet,
+                ReceiverWalletCode = null,
+                ReceiverEmail = UserEmail,
+                Amount = AmountValue,
+                SenderCurrency = currencies.FirstOrDefault(c => c.CurrencyCode == SenderWallet.Currency),
+                Currency = Currency
+            };
+
+        var content = new StringContent(JsonSerializer.Serialize(newTransaction), System.Text.Encoding.UTF8, "application/json");
+        var response = await HttpClient.PostAsync("/api/transaction", content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Snackbar.Add("The transaction was made", Severity.Success);
+            NavigationManager.NavigateTo("/wallet");
+        }
+        else
+        {
+            Snackbar.Add("Error! The transaction was not made", Severity.Error);
+        }
+    }
+
+    async Task ByCode() => NavigationManager.NavigateTo("/wallet/transaction");
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await authService.GetUserId();
+        if (userId == null)
+            NavigationManager.NavigateTo("/");
+        else
+        {
+            currencies = await HttpClient.GetFromJsonAsync<List<CurrencyDTO>>($"/api/currencies");
+            wallets = await HttpClient.GetFromJsonAsync<List<WalletDTO>>($"/api/wallet/getwallets/{userId}");
+        }
+    }
+}

@@ -9,6 +9,7 @@ namespace Endava.TechCourse.BankApp.Domain.Models
         public string DestinationWalletCode { get; set; }
         public string DestinationUserId { get; set; }
         public decimal Amount { get; set; }
+        public decimal Commission { get; set; }
         public Guid CurrencyId { get; set; }
         public Currency Currency { get; set; }
         public DateTime CreationDate { get; set; }

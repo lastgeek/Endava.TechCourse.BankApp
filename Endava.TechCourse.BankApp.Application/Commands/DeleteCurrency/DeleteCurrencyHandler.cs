@@ -16,7 +16,7 @@ namespace Endava.TechCourse.BankApp.Application.Commands.DeleteCurrency
         {
             var currency = await _context.Currency.FindAsync(request.CurrencyId);
 
-            if (currency == null)
+            if (currency == null || !currency.CanBeRemoved)
             {
                 return false;
             }

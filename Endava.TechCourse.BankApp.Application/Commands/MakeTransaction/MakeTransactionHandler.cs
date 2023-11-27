@@ -32,6 +32,10 @@ namespace Endava.TechCourse.BankApp.Application.Commands.MakeTransaction
                 return;
             }
 
+            var walletType = _context.WalletType.FirstOrDefault(w => w.Id == senderWallet.TypeId);
+            var commision = request.Amount * walletType.Commision;
+            var amountWithCommision = request.Amount - commision;
+
             var senderWalletUpdate = new UpdateWalletCommand
             {
                 WalletCode = request.SenderWalletCode,
@@ -42,7 +46,7 @@ namespace Endava.TechCourse.BankApp.Application.Commands.MakeTransaction
             var receiverWalletUpdate = new UpdateWalletCommand
             {
                 WalletCode = request.ReceiverWalletCode,
-                UpdateAmount = request.Amount,
+                UpdateAmount = amountWithCommision,
                 Currency = request.CurrencyId
             };
 
@@ -55,7 +59,8 @@ namespace Endava.TechCourse.BankApp.Application.Commands.MakeTransaction
                 SourceUserId = senderWallet.UserId.ToString(),
                 DestinationWalletCode = request.ReceiverWalletCode,
                 DestinationUserId = receiverWallet.UserId.ToString(),
-                Amount = request.Amount,
+                Amount = amountWithCommision,
+                Commission = commision,
                 CurrencyId = request.CurrencyId,
                 Currency = currency,
                 CreationDate = DateTime.Now

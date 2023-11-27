@@ -11,7 +11,15 @@
         <MudText Align="Align.Center" Class="mb-n4">Create wallet</MudText>
         <br/>
         <MudForm @bind-IsValid="@success">
-            <MudTextField @bind-Value="WalletType" Label="Type" Required="true" RequiredError="Type is required!" />
+            <MudSelect T="string" @bind-Value="WalletType" RequiredError="Type is required!" Label="Type" AnchorOrigin="Origin.BottomCenter">
+                @if (walletTypes != null)
+                {
+                    foreach (var item in walletTypes)
+                    {
+                        <MudSelectItem T="string" Value="@item.Id">@item.TypeName</MudSelectItem>
+                    }
+                }
+            </MudSelect>
             <MudTextField @bind-Value="AmountValue" Label="Amount" Required="true" RequiredError="Amount is required!" />
             <MudSelect T="string" @bind-Value="CurrencyCode" RequiredError="Currency is required!" Label="Currency" AnchorOrigin="Origin.BottomCenter">
                 @if (currencies != null)
@@ -33,6 +41,7 @@
 
 @code {
     List<CurrencyDTO> currencies;
+    List<WalletTypeDTO> walletTypes;
     bool success;
     public string WalletType { get; set; }
     public decimal AmountValue { get; set; }
@@ -49,7 +58,7 @@
             };
 
         var content = new StringContent(JsonSerializer.Serialize(newWallet), System.Text.Encoding.UTF8, "application/json");
-        var response = await HttpClient.PostAsync("https://localhost:7100/api/wallet", content);
+        var response = await HttpClient.PostAsync("/api/wallet", content);
 
         if (response.IsSuccessStatusCode)
         {
@@ -63,6 +72,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        currencies = await HttpClient.GetFromJsonAsync<List<CurrencyDTO>>($"https://localhost:7100/api/currencies");
+        currencies = await HttpClient.GetFromJsonAsync<List<CurrencyDTO>>($"/api/currencies");
+        walletTypes = await HttpClient.GetFromJsonAsync<List<WalletTypeDTO>>($"/api/type");
     }
 }

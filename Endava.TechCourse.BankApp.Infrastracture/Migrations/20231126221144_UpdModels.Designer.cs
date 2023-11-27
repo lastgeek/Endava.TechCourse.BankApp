@@ -4,6 +4,7 @@ using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231126221144_UpdModels")]
+    partial class UpdModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,9 +57,6 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Commission")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreationDate")
@@ -184,8 +184,9 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                     b.Property<bool>("MainWallet")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("TypeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -194,30 +195,7 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
 
                     b.HasIndex("CurrencyId");
 
-                    b.HasIndex("TypeId");
-
                     b.ToTable("Wallets");
-                });
-
-            modelBuilder.Entity("Endava.TechCourse.BankApp.Domain.Models.WalletType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("CanBeRemoved")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Commision")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("TypeName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("WalletType");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -250,13 +228,13 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("4cc0fc5e-6526-4c90-a339-0d12ab78febf"),
+                            Id = new Guid("aed05efa-1146-4e7c-bb96-3f737343fd87"),
                             Name = "User",
                             NormalizedName = "User"
                         },
                         new
                         {
-                            Id = new Guid("5f9422a3-c368-481c-a988-c8df2f34621c"),
+                            Id = new Guid("9d9b403b-762e-4c30-aa6b-c9b3fe01c148"),
                             Name = "Admin",
                             NormalizedName = "Admin"
                         });
@@ -384,15 +362,7 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Endava.TechCourse.BankApp.Domain.Models.WalletType", "Type")
-                        .WithMany()
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Currency");
-
-                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

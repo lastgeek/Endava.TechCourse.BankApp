@@ -15,28 +15,56 @@
         <MudTh>Code</MudTh>
         <MudTh>Type</MudTh>
         <MudTh>Amount</MudTh>
+        <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd>**** @context.Code.Substring(11, 4)</MudTd>
+        <MudTd>**** @context.Code.Substring(12, 4)</MudTd>
         <MudTd>@context.Type</MudTd>
         <MudTd>@context.Amount @context.Currency</MudTd>
+        <MudTd DataLabel="Nr">
+            @if (!context.MainWallet)
+            {
+                <MudButton Color="Color.Error" OnClick="@((e) => DeactivateWallet(context.Id))">Sterge</MudButton>
+            }
+        </MudTd>
     </RowTemplate>
 </MudTable>
 
 @code {
     List<WalletDTO> wallets;
+    private string userId;
+    private string deleteWalletError = string.Empty;
 
     void OnRowClick(TableRowClickEventArgs<WalletDTO> args)
     {
         NavigationManager.NavigateTo("/wallet/" + args.Item.Id);
     }
 
+    public async Task DeactivateWallet(string id)
+    {
+        var result = await this.HttpClient.PutAsJsonAsync("api/wallet/deactivate", id);
+
+        if (result.IsSuccessStatusCode)
+        {
+            await GetWallets();
+            deleteWalletError = string.Empty;
+        }
+        else
+        {
+            deleteWalletError = await result.Content.ReadAsStringAsync();
+        }
+
+        StateHasChanged();
+    }
+
+    public async Task GetWallets() => wallets = await this.HttpClient.GetFromJsonAsync<List<WalletDTO>>($"/api/wallet/getwallets/{userId}");
+
     protected override async Task OnInitializedAsync()
     {
-        var userId = await authService.GetUserId();
+        userId = await authService.GetUserId();
         if (userId == null)
             NavigationManager.NavigateTo("/");
         else
-            wallets = await HttpClient.GetFromJsonAsync<List<WalletDTO>>($"/api/wallet/getwallets/{userId}");
+            await GetWallets();
     }
 }

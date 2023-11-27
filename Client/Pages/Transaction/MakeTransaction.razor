@@ -12,12 +12,12 @@
         <MudText Align="Align.Center" Class="mb-n4">Make Transaction</MudText>
         <br />
         <MudForm @bind-IsValid="@success">
-            <MudSelect T="string" @bind-Value="Code" RequiredError="Wallet is required!" Label="Wallet" AnchorOrigin="Origin.BottomCenter">
+            <MudSelect T="WalletDTO" @bind-Value="SenderWallet" RequiredError="Wallet is required!" Label="Wallet" AnchorOrigin="Origin.BottomCenter">
                 @if (wallets != null)
                 {
                     foreach (var item in wallets)
                     {
-                        <MudSelectItem T="string" Value="@item.Code">@item.Code</MudSelectItem>
+                        <MudSelectItem T="WalletDTO" Value="@item">@item.Code</MudSelectItem>
                     }
                 }
             </MudSelect>
@@ -34,8 +34,9 @@
             </MudSelect>
             <br />
             <div class="d-flex align-center justify-space-between">
-                <MudButton Disabled="@(!success)" Variant="Variant.Text" Class="ml-auto" Color="Color.Primary" OnClick="() => CreateNewWallet()">Make</MudButton>
+                <MudButton Disabled="@(!success)" Variant="Variant.Text" Class="ml-auto" Color="Color.Primary" OnClick="() => CreateNewTransaction()">Make</MudButton>
             </div>
+            <MudButton Variant="Variant.Text" OnClick="ByEmail">Don't have code? Use email</MudButton>
         </MudForm>
     </MudPaper>
 </MudGrid>
@@ -45,20 +46,20 @@
     List<CurrencyDTO> currencies;
     List<WalletDTO> wallets;
     bool success;
-    public string Code { get; set; }
+    public WalletDTO SenderWallet { get; set; }
     public string WalletCode { get; set; }
     public decimal AmountValue { get; set; }
     public CurrencyDTO Currency { get; set; }
 
-    async Task CreateNewWallet()
+    async Task CreateNewTransaction()
     {
-        var newTransaction = new WalletTransactionDTO
+        var newTransaction = new MakeTransactionDTO
             {
-                SenderWalletCode = Code,
+                SenderWallet = SenderWallet,
                 ReceiverWalletCode = WalletCode,
                 Amount = AmountValue,
-                CurrencyId = new Guid(Currency.Id),
-                CurrencyCode = Currency.CurrencyCode
+                SenderCurrency = currencies.FirstOrDefault(c => c.CurrencyCode == SenderWallet.Currency),
+                Currency = Currency
             };
 
         var content = new StringContent(JsonSerializer.Serialize(newTransaction), System.Text.Encoding.UTF8, "application/json");
@@ -75,13 +76,15 @@
         }
     }
 
+    async Task ByEmail() => NavigationManager.NavigateTo("/wallet/email_transaction");
+
     protected override async Task OnInitializedAsync()
     {
-        currencies = await HttpClient.GetFromJsonAsync<List<CurrencyDTO>>($"https://localhost:7100/api/currencies");
         var userId = await authService.GetUserId();
         if (userId == null)
             NavigationManager.NavigateTo("/");
         else
+            currencies = await HttpClient.GetFromJsonAsync<List<CurrencyDTO>>($"https://localhost:7100/api/currencies");
             wallets = await HttpClient.GetFromJsonAsync<List<WalletDTO>>($"https://localhost:7100/api/wallet/getwallets/{userId}");
     }
 }

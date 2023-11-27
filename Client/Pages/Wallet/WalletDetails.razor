@@ -22,12 +22,14 @@
             <MudTh>Sender wallet</MudTh>
             <MudTh>Receiver wallet</MudTh>
             <MudTh>Amount</MudTh>
+            <MudTh>Commission</MudTh>
             <MudTh>Currency</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>@context.SenderWalletCode</MudTd>
             <MudTd>@context.ReceiverWalletCode</MudTd>
             <MudTd>@context.Amount</MudTd>
+            <MudTd>@context.Commission</MudTd>
             <MudTd>@context.CurrencyCode</MudTd>
         </RowTemplate>
     </MudTable>
@@ -49,7 +51,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        wallet = await HttpClient.GetFromJsonAsync<WalletDTO>($"https://localhost:7100/api/wallet/{Id}");
-        transactions = await HttpClient.GetFromJsonAsync<List<WalletTransactionDTO>>($"https://localhost:7100/api/transaction/{wallet.Code}");
+        wallet = await HttpClient.GetFromJsonAsync<WalletDTO>($"/api/wallet/{Id}");
+        transactions = await HttpClient.GetFromJsonAsync<List<WalletTransactionDTO>>($"/api/transaction/{wallet.Code}");
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Endava.TechCourse.BankApp.Application.Commands.CreateWallet;
+using Endava.TechCourse.BankApp.Application.Commands.DeactivateWallet;
 using Endava.TechCourse.BankApp.Application.Commands.DeleteWallet;
 using Endava.TechCourse.BankApp.Application.Commands.UpdateWallet;
 using Endava.TechCourse.BankApp.Application.Queries.GetWallets;
@@ -32,7 +33,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             var command = new CreateWalletCommand()
             {
                 Code = walletCode,
-                Type = createWalletDTO.Type,
+                TypeId = createWalletDTO.Type,
                 Amount = createWalletDTO.Amount,
                 CurrencyCode = createWalletDTO.CurrencyCode,
                 UserId = createWalletDTO.UserId
@@ -46,6 +47,22 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
         public async Task<IActionResult> DeleteWallet(Guid id)
         {
             var command = new DeleteWalletCommand { WalletId = id };
+            var result = await _mediator.Send(command);
+
+            if (result)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPut("deactivate")]
+        public async Task<IActionResult> DeactivateWallet([FromBody] string id)
+        {
+            var command = new DeactivateWalletCommand { WalletId = new Guid(id) };
             var result = await _mediator.Send(command);
 
             if (result)
@@ -84,7 +101,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
         {
             var command = new GetWalletByIdQuery { Id = id };
             var wallet = await _mediator.Send(command);
-            if (wallet == null)
+            if (wallet == null || !wallet.Active)
             {
                 return NotFound("Wallet not found");
             }
@@ -94,7 +111,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                 Id = wallet.Id.ToString(),
                 Code = wallet.Code,
                 Currency = wallet.Currency?.CurrencyCode,
-                Type = wallet.Type,
+                Type = wallet.Type.TypeName,
                 Amount = wallet.Amount,
                 MainWallet = wallet.MainWallet
             };
@@ -122,14 +139,14 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
                     Id = wallet.Id.ToString(),
                     Code = wallet.Code,
                     Currency = wallet.Currency?.CurrencyCode,
-                    Type = wallet.Type,
+                    Type = wallet.Type.TypeName,
                     Amount = wallet.Amount,
                     MainWallet = wallet.MainWallet
                 };
                 dtos.Add(dto);
             }
 
-            return Ok(dtos);
+            return Ok(dtos.OrderByDescending(x => x.MainWallet));
         }
     }
 }

@@ -18,18 +18,19 @@ namespace Endava.TechCourse.BankApp.Application.Commands.CreateWallet
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == new Guid(request.UserId));
             var currency = _context.Currency.FirstOrDefault(c => c.CurrencyCode == request.CurrencyCode);
-            if (currency == null || user == null)
+            var type = _context.WalletType.FirstOrDefault(t => t.Id == new Guid(request.TypeId));
+            if (currency == null || user == null || type == null)
             {
-                throw new Exception($"Currency with code '{request.CurrencyCode}' " +
-                    $"or user with id '{request.UserId}' not found.");
+                throw new Exception($"User not found.");
             }
             var wallet = new Wallet
             {
                 Code = request.Code,
-                Type = request.Type,
+                Type = type,
                 Amount = request.Amount,
                 Currency = currency,
-                UserId = new Guid(request.UserId)
+                UserId = new Guid(request.UserId),
+                Active = true
             };
 
             var userWallets = await _context.Wallets
@@ -37,6 +38,9 @@ namespace Endava.TechCourse.BankApp.Application.Commands.CreateWallet
                 .ToListAsync();
 
             wallet.MainWallet = userWallets.Count == 0;
+
+            if (currency.CanBeRemoved) currency.CanBeRemoved = false;
+            if (type.CanBeRemoved) type.CanBeRemoved = false;
 
             await _context.Wallets.AddAsync(wallet, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
