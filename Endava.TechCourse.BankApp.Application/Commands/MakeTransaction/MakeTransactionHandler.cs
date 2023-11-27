@@ -18,8 +18,8 @@ namespace Endava.TechCourse.BankApp.Application.Commands.MakeTransaction
 
         public async Task Handle(MakeTransactionCommand request, CancellationToken cancellationToken)
         {
-            var senderWallet = _context.Wallets.FirstOrDefault(w => w.Id == request.SenderWalletId);
-            var receiverWallet = _context.Wallets.FirstOrDefault(w => w.Id == request.ReceiverWalletId);
+            var senderWallet = _context.Wallets.FirstOrDefault(w => w.Code == request.SenderWalletCode);
+            var receiverWallet = _context.Wallets.FirstOrDefault(w => w.Code == request.ReceiverWalletCode);
             var currency = _context.Currency.FirstOrDefault(c => c.Id == request.CurrencyId);
 
             if (senderWallet == null || receiverWallet == null)
@@ -32,17 +32,21 @@ namespace Endava.TechCourse.BankApp.Application.Commands.MakeTransaction
                 return;
             }
 
+            var walletType = _context.WalletType.FirstOrDefault(w => w.Id == senderWallet.TypeId);
+            var commision = request.Amount * walletType.Commision;
+            var amountWithCommision = request.Amount - commision;
+
             var senderWalletUpdate = new UpdateWalletCommand
             {
-                WalletId = request.SenderWalletId,
+                WalletCode = request.SenderWalletCode,
                 UpdateAmount = -request.Amount,
                 Currency = request.CurrencyId
             };
 
             var receiverWalletUpdate = new UpdateWalletCommand
             {
-                WalletId = request.ReceiverWalletId,
-                UpdateAmount = request.Amount,
+                WalletCode = request.ReceiverWalletCode,
+                UpdateAmount = amountWithCommision,
                 Currency = request.CurrencyId
             };
 
@@ -51,13 +55,15 @@ namespace Endava.TechCourse.BankApp.Application.Commands.MakeTransaction
 
             var transaction = new Transaction
             {
-                SourceWalletId = request.SenderWalletId,
+                SourceWalletCode = request.SenderWalletCode,
                 SourceUserId = senderWallet.UserId.ToString(),
-                DestinationWalletId = request.ReceiverWalletId,
+                DestinationWalletCode = request.ReceiverWalletCode,
                 DestinationUserId = receiverWallet.UserId.ToString(),
-                Amount = request.Amount,
+                Amount = amountWithCommision,
+                Commission = commision,
                 CurrencyId = request.CurrencyId,
-                Currency = currency
+                Currency = currency,
+                CreationDate = DateTime.Now
             };
 
             await _context.Transactions.AddAsync(transaction, cancellationToken);

@@ -123,7 +123,7 @@
 
     public async Task DeleteCurrency(string id)
     {
-        var result = await this.httpClient.PostAsJsonAsync("api/currencies/delete", id);
+        var result = await this.httpClient.DeleteAsync($"api/currencies/{id}");
 
         if (result.IsSuccessStatusCode){
             await GetCurrencies();

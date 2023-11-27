@@ -3,7 +3,6 @@ using Endava.TechCourse.BankApp.Application.Commands.DeleteCurrency;
 using Endava.TechCourse.BankApp.Application.Commands.UpdateCurrency;
 using Endava.TechCourse.BankApp.Application.Queries.GetCurrencies;
 using Endava.TechCourse.BankApp.Application.Queries.GetCurrencyById;
-using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using Endava.TechCourse.BankApp.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,14 +13,11 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
     [ApiController]
     public class CurrencyController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly IMediator _mediator;
 
-        public CurrencyController(ApplicationDbContext dbContext, IMediator mediator)
+        public CurrencyController(IMediator mediator)
         {
-            ArgumentNullException.ThrowIfNull(dbContext);
             ArgumentNullException.ThrowIfNull(mediator);
-            _context = dbContext;
             _mediator = mediator;
         }
 
@@ -77,7 +73,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
 
             var dto = new CurrencyDTO()
             {
-                CanBeRemoved = true,
+                CanBeRemoved = currency.CanBeRemoved,
                 ChangeRate = currency.CurrencyRate,
                 CurrencyCode = currency.CurrencyCode,
                 Id = currency.Id.ToString(),
@@ -99,7 +95,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             {
                 var dto = new CurrencyDTO()
                 {
-                    CanBeRemoved = true,
+                    CanBeRemoved = currency.CanBeRemoved,
                     ChangeRate = currency.CurrencyRate,
                     CurrencyCode = currency.CurrencyCode,
                     Id = currency.Id.ToString(),

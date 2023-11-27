@@ -28,6 +28,9 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("CanBeRemoved")
+                        .HasColumnType("bit");
+
                     b.Property<string>("CurrencyCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -53,6 +56,12 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal>("Commission")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("CurrencyId")
                         .HasColumnType("uniqueidentifier");
 
@@ -60,15 +69,17 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("DestinationWalletId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DestinationWalletCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SourceUserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SourceWalletId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SourceWalletCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -157,15 +168,24 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("CurrencyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("MainWallet")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("TypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -174,7 +194,30 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
 
                     b.HasIndex("CurrencyId");
 
+                    b.HasIndex("TypeId");
+
                     b.ToTable("Wallets");
+                });
+
+            modelBuilder.Entity("Endava.TechCourse.BankApp.Domain.Models.WalletType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("CanBeRemoved")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Commision")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WalletType");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -207,13 +250,13 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("67c5d988-043e-4c36-b565-7cf2a5b92912"),
+                            Id = new Guid("4cc0fc5e-6526-4c90-a339-0d12ab78febf"),
                             Name = "User",
                             NormalizedName = "User"
                         },
                         new
                         {
-                            Id = new Guid("0bda9b2d-51b4-4e0c-b5df-b7dcb23d5fbc"),
+                            Id = new Guid("5f9422a3-c368-481c-a988-c8df2f34621c"),
                             Name = "Admin",
                             NormalizedName = "Admin"
                         });
@@ -341,7 +384,15 @@ namespace Endava.TechCourse.BankApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Endava.TechCourse.BankApp.Domain.Models.WalletType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Currency");
+
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

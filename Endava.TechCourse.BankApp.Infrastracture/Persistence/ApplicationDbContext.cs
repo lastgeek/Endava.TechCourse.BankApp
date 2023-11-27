@@ -18,6 +18,8 @@ namespace Endava.TechCourse.BankApp.Infrastracture.Persistance
 
         public DbSet<Currency> Currency { get; set; }
 
+        public DbSet<WalletType> WalletType { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Transaction>().HasKey(e => e.Id);
@@ -25,6 +27,8 @@ namespace Endava.TechCourse.BankApp.Infrastracture.Persistance
             modelBuilder.Entity<Currency>().HasKey(e => e.Id);
 
             modelBuilder.Entity<Wallet>().HasKey(e => e.Id);
+
+            modelBuilder.Entity<WalletType>().HasKey(e => e.Id);
 
             modelBuilder.Entity<Currency>()
                 .HasMany(e => e.Wallets)

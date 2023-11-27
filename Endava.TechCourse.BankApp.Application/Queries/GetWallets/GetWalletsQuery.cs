@@ -5,5 +5,6 @@ namespace Endava.TechCourse.BankApp.Application.Queries.GetWallets
 {
     public class GetWalletsQuery : IRequest<List<Wallet>>
     {
+        public Guid UserId { get; set; }
     }
 }

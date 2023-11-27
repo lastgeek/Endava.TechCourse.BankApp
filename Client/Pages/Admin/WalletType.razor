@@ -1,0 +1,130 @@
+﻿@page "/wallet-type"
+@layout AdminLayout
+@inject HttpClient httpClient
+
+<MudGrid>
+    <MudItem md="7">
+        @if (walletTypes == null || !walletTypes.Any())
+        {
+            <MudAlert Class="pa-4 mt-6" Severity="Severity.Error">Nu exista valute la moment.</MudAlert>
+        }
+        else
+        {
+            <MudTable Elevation="3" Class="pa-4 mt-6" Items="@walletTypes" Height="400px">
+                <HeaderContent>
+                    <MudTh>Denumirea</MudTh>
+                    <MudTh>Commision</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <ColGroup>
+                    <col style="width: 50%;" />
+                    <col />
+                    <col />
+                    <col />
+                </ColGroup>
+                <RowTemplate>
+                    <MudTd DataLabel="Nr">@context.TypeName</MudTd>
+                    <MudTd DataLabel="Nr">@context.Commision</MudTd>
+
+                    <MudTd DataLabel="Nr">
+                        @if (context.CanBeRemoved)
+                        {
+                            <MudButton Color="Color.Error" OnClick="@((e) => DeleteWalletType(context.Id))">Delete</MudButton>
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+            <MudItem md="12">
+                @if (newWalletTypeError != string.Empty)
+                {
+                    <MudAlert>@newWalletTypeError</MudAlert>
+                }
+            </MudItem>
+        }
+    </MudItem>
+
+    <MudItem md="4">
+        <MudGrid>
+            <MudItem md="12" Class="mt-4">
+                <MudText>New Type : </MudText>
+            </MudItem>
+
+            <MudItem md="12">
+                <MudPaper Elevation="3" Class="pa-2">
+                    <MudTextField T="string" @bind-Value="newWalletType.TypeName" Label="Wallet Type Name" />
+                </MudPaper>
+            </MudItem>
+            <MudItem md="5">
+                <MudPaper Elevation="3" Class="pa-2">
+                    <MudTextField T="decimal" @bind-Value="newWalletType.Commision" Label="Commision" />
+                </MudPaper>
+            </MudItem>
+            <MudItem md="3">
+                <MudButton Class="mt-4" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddCurrency">Add</MudButton>
+            </MudItem>
+            <MudItem md="12">
+                @if (newWalletTypeError != string.Empty)
+                {
+                    <MudAlert>@newWalletTypeError</MudAlert>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private List<WalletTypeDTO> walletTypes;
+    private WalletTypeDTO newWalletType = new();
+    private string newWalletTypeError = string.Empty;
+    private string deleteWalletTypeError = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        walletTypes = new List<WalletTypeDTO>();
+        await GetWalletTypes();
+        StateHasChanged();
+
+        await base.OnInitializedAsync();
+    }
+
+    public async Task GetWalletTypes() => walletTypes = await this.httpClient.GetFromJsonAsync<List<WalletTypeDTO>>("api/type");
+
+
+    public async Task AddCurrency()
+    {
+        if (string.IsNullOrEmpty(newWalletType.TypeName))
+            newWalletTypeError = "Wallet type can't be empty";
+        else if (newWalletType.Commision < 0)
+            newWalletTypeError = "Commission cannot be lower than 0";
+        else
+        {
+            var result = await this.httpClient.PostAsJsonAsync("api/type", newWalletType);
+
+            if (!result.IsSuccessStatusCode)
+                newWalletTypeError = await result.Content.ReadAsStringAsync();
+            else
+            {
+                await GetWalletTypes();
+                newWalletTypeError = string.Empty;
+                newWalletType = new();
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    public async Task DeleteWalletType(string id)
+    {
+        var result = await this.httpClient.DeleteAsync($"api/type/{id}");
+
+        if (result.IsSuccessStatusCode)
+        {
+            await GetWalletTypes();
+            newWalletTypeError = string.Empty;
+        }
+        else
+            newWalletTypeError = await result.Content.ReadAsStringAsync();
+
+        StateHasChanged();
+    }
+}

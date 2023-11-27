@@ -30,7 +30,8 @@ namespace Endava.TechCourse.BankApp.Application.Commands.AddCurrency
             {
                 Name = request.Name,
                 CurrencyCode = request.CurrencyCode,
-                CurrencyRate = request.ChangeRate
+                CurrencyRate = request.ChangeRate,
+                CanBeRemoved = true
             };
 
             await _context.Currency.AddAsync(currency, cancellationToken);
