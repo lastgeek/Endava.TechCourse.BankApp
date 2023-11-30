@@ -12,7 +12,6 @@ namespace Endava.TechCourse.BankApp.Application.Queries.GetUserDetails
         public GetUserDetailsHandler(UserManager<User> userManager)
         {
             ArgumentNullException.ThrowIfNull(userManager);
-
             this.userManager = userManager;
         }
 

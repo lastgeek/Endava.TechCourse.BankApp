@@ -10,12 +10,13 @@ namespace Endava.TechCourse.BankApp.Application.Queries.GetWalletTypeById
 
         public GetWalletTypeByIdHandler(ApplicationDbContext context)
         {
+            ArgumentNullException.ThrowIfNull(context);
             _context = context;
         }
 
         public async Task<WalletType> Handle(GetWalletTypeByIdQuery request, CancellationToken cancellationToken)
         {
-            var walletType = await _context.WalletType.FindAsync(request.WalletTypeId);
+            var walletType = await _context.WalletType.FindAsync(request.WalletTypeId, cancellationToken);
 
             if (walletType == null)
             {

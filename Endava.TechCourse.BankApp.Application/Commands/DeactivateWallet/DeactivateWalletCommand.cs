@@ -2,8 +2,8 @@
 
 namespace Endava.TechCourse.BankApp.Application.Commands.DeactivateWallet
 {
-    public class DeactivateWalletCommand : IRequest<bool>
+    public class DeactivateWalletCommand : IRequest<CommandStatus>
     {
-        public Guid WalletId { get; set; }
+        public string WalletId { get; set; }
     }
 }

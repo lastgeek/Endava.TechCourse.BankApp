@@ -27,7 +27,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             var command = new DeleteCurrencyCommand { CurrencyId = id };
             var result = await _mediator.Send(command);
 
-            if (result)
+            if (result.IsSuccessful)
             {
                 return NoContent();
             }

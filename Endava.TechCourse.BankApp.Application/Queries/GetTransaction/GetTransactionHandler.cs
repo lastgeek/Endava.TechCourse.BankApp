@@ -21,7 +21,7 @@ namespace Endava.TechCourse.BankApp.Application.Queries.GetTransaction
                 .Include(w => w.Currency)
                 .AsNoTracking()
                 .Where(t => t.SourceWalletCode == request.walletCode || t.DestinationWalletCode == request.walletCode)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return transactions;
         }

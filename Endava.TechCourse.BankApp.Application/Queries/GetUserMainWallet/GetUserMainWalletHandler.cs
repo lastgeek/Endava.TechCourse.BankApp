@@ -17,7 +17,7 @@ namespace Endava.TechCourse.BankApp.Application.Queries.GetUserMainWallet
 
         public async Task<Wallet> Handle(GetUserMainWalletQuery request, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == request.UserEmail);
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == request.UserEmail, cancellationToken);
             if (user == null)
             {
                 return null;
