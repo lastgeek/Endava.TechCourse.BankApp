@@ -11,12 +11,14 @@ namespace Endava.TechCourse.BankApp.Application.Commands.AddWalletType
 
         public AddWalletTypeHandler(ApplicationDbContext context)
         {
+            ArgumentNullException.ThrowIfNull(context);
             _context = context;
         }
 
         public async Task<CommandStatus> Handle(AddWalletTypeCommand request, CancellationToken cancellationToken)
         {
-            if (await _context.WalletType.AnyAsync(x => x.TypeName == request.TypeName, default))
+            var checkWalletTypeName = await _context.WalletType.AnyAsync(x => x.TypeName == request.TypeName, cancellationToken);
+            if (checkWalletTypeName)
             {
                 return CommandStatus.Failed("Wallet type with this name already exists");
             }

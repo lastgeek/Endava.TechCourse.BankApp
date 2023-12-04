@@ -2,7 +2,7 @@
 
 namespace Endava.TechCourse.BankApp.Application.Commands.MakeTransaction
 {
-    public class MakeTransactionCommand : IRequest
+    public class MakeTransactionCommand : IRequest<CommandStatus>
     {
         public string SenderWalletCode { get; set; }
         public string ReceiverWalletCode { get; set; }

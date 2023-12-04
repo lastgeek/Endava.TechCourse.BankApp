@@ -3,28 +3,31 @@ using Endava.TechCourse.BankApp.Infrastracture.Persistance;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public class GetWalletByIdQueryHandler : IRequestHandler<GetWalletByIdQuery, Wallet>
+namespace Endava.TechCourse.BankApp.Application.Queries.GetWalletById
 {
-    private readonly ApplicationDbContext _context;
-
-    public GetWalletByIdQueryHandler(ApplicationDbContext context)
+    public class GetWalletByIdQueryHandler : IRequestHandler<GetWalletByIdQuery, Wallet>
     {
-        ArgumentNullException.ThrowIfNull(context);
-        _context = context;
-    }
+        private readonly ApplicationDbContext _context;
 
-    public async Task<Wallet> Handle(GetWalletByIdQuery request, CancellationToken cancellationToken)
-    {
-        var wallet = await _context.Wallets
-            .Include(w => w.Currency)
-            .Include(w => w.Type)
-            .FirstOrDefaultAsync(w => w.Id == request.Id, cancellationToken);
-
-        if (wallet == null)
+        public GetWalletByIdQueryHandler(ApplicationDbContext context)
         {
-            return null;
+            ArgumentNullException.ThrowIfNull(context);
+            _context = context;
         }
 
-        return wallet;
+        public async Task<Wallet> Handle(GetWalletByIdQuery request, CancellationToken cancellationToken)
+        {
+            var wallet = await _context.Wallets
+                .Include(w => w.Currency)
+                .Include(w => w.Type)
+                .FirstOrDefaultAsync(w => w.Id == request.Id, cancellationToken);
+
+            if (wallet == null)
+            {
+                return null;
+            }
+
+            return wallet;
+        }
     }
 }

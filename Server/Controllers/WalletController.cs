@@ -49,7 +49,7 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
             var command = new DeleteWalletCommand { WalletId = id };
             var result = await _mediator.Send(command);
 
-            if (result)
+            if (result.IsSuccessful)
             {
                 return NoContent();
             }
@@ -62,10 +62,10 @@ namespace Endava.TechCourse.BankApp.Server.Controllers
         [HttpPut("deactivate")]
         public async Task<IActionResult> DeactivateWallet([FromBody] string id)
         {
-            var command = new DeactivateWalletCommand { WalletId = new Guid(id) };
+            var command = new DeactivateWalletCommand { WalletId = id };
             var result = await _mediator.Send(command);
 
-            if (result)
+            if (result.IsSuccessful)
             {
                 return NoContent();
             }

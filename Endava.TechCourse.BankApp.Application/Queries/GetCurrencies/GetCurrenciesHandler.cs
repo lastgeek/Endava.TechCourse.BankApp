@@ -17,7 +17,7 @@ namespace Endava.TechCourse.BankApp.Application.Queries.GetCurrencies
 
         public async Task<List<Currency>> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)
         {
-            var currencies = await _context.Currency.ToListAsync();
+            var currencies = await _context.Currency.ToListAsync(cancellationToken);
 
             return currencies;
         }

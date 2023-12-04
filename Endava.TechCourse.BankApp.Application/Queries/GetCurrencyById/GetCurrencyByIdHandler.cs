@@ -10,12 +10,13 @@ namespace Endava.TechCourse.BankApp.Application.Queries.GetCurrencyById
 
         public GetCurrencyByIdHandler(ApplicationDbContext context)
         {
+            ArgumentNullException.ThrowIfNull(context);
             _context = context;
         }
 
         public async Task<Currency> Handle(GetCurrencyByIdQuery request, CancellationToken cancellationToken)
         {
-            var currency = await _context.Currency.FindAsync(request.CurrencyId);
+            var currency = await _context.Currency.FindAsync(request.CurrencyId, cancellationToken);
 
             if (currency == null)
             {
