@@ -30,7 +30,7 @@ namespace Endava.TechCourse.BankApp.Application.Commands.DeactivateWallet
                 return CommandStatus.Failed("Cannot deactivate main wallet.");
             }
 
-            var mainWallet = await _context.Wallets.FirstOrDefaultAsync(w => w.MainWallet, cancellationToken);
+            var mainWallet = await _context.Wallets.FirstOrDefaultAsync(w => w.MainWallet && w.UserId == wallet.UserId, cancellationToken);
 
             if (mainWallet == null)
             {
